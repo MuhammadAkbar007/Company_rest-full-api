@@ -8,6 +8,7 @@ import uz.pdp.task1_lesson1_modul2.entity.Address;
 import uz.pdp.task1_lesson1_modul2.entity.Company;
 import uz.pdp.task1_lesson1_modul2.payload.ApiResponse;
 import uz.pdp.task1_lesson1_modul2.payload.CompanyDto;
+import uz.pdp.task1_lesson1_modul2.repository.AddressRepository;
 import uz.pdp.task1_lesson1_modul2.repository.CompanyRepository;
 
 import java.util.Optional;
@@ -18,6 +19,9 @@ public class CompanyService {
     @Autowired
     CompanyRepository companyRepository;
 
+    @Autowired
+    AddressRepository addressRepository;
+
     /**
      * method to add new company in controller.add(companyDto)
      *
@@ -27,7 +31,9 @@ public class CompanyService {
     public ResponseEntity<?> add(CompanyDto companyDto) {
         if (companyRepository.existsByCorpNameAndDirectorNameAndAddress_StreetAndAddress_HomeNumber(companyDto.getCorpName(), companyDto.getDirectorName(), companyDto.getStreet(), companyDto.getHomeNumber()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse("Such company already exists !", false));
-        companyRepository.save(new Company(companyDto.getCorpName(), companyDto.getDirectorName(), new Address(companyDto.getStreet(), companyDto.getHomeNumber())));
+        Address address = new Address(companyDto.getStreet(), companyDto.getHomeNumber());
+        addressRepository.save(address);
+        companyRepository.save(new Company(companyDto.getCorpName(), companyDto.getDirectorName(), address));
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Company successfully added !", true));
     }
 

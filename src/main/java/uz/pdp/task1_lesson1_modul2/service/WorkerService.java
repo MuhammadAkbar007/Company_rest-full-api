@@ -28,7 +28,6 @@ public class WorkerService {
     @Autowired
     DepartmentRepository departmentRepository;
 
-
     /**
      * method to create worker
      *
@@ -38,13 +37,12 @@ public class WorkerService {
     public ResponseEntity<?> add(WorkerDto workerDto) {
         if (workerRepository.existsByPhoneNumber(workerDto.getPhoneNumber()))
             return ResponseEntity.status(HttpStatus.CONFLICT).body(new ApiResponse("Such worker already exists !", false));
-        Optional<Address> optionalAddress = addressRepository.findById(workerDto.getAddressId());
-        if (!optionalAddress.isPresent())
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Such worker address not found !", false));
         Optional<Department> optionalDepartment = departmentRepository.findById(workerDto.getDepartmentId());
         if (!optionalDepartment.isPresent())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Such worker department not found !", false));
-        workerRepository.save(new Worker(workerDto.getName(), workerDto.getPhoneNumber(), optionalAddress.get(), optionalDepartment.get()));
+        Address address = new Address(workerDto.getStreet(), workerDto.getHomeNumber());
+        addressRepository.save(address);
+        workerRepository.save(new Worker(workerDto.getName(), workerDto.getPhoneNumber(), address, optionalDepartment.get()));
         return ResponseEntity.status(HttpStatus.CREATED).body(new ApiResponse("Worker successfully created !", true));
     }
 

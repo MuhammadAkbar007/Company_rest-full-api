@@ -11,5 +11,9 @@ public class WorkerDto {
 
     private Integer addressId;
 
+    private String Street;
+
+    private Integer HomeNumber;
+
     private Integer departmentId;
 }
