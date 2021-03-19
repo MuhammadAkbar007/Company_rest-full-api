@@ -74,7 +74,10 @@ public class CompanyService {
         Company company = optionalCompany.get();
         company.setCorpName(companyDto.getCorpName());
         company.setDirectorName(companyDto.getDirectorName());
-        company.setAddress(new Address(companyDto.getStreet(), companyDto.getHomeNumber()));
+        Optional<Address> optionalAddress = addressRepository.findByStreetAndHomeNumber(companyDto.getStreet(), companyDto.getHomeNumber());
+        if (!optionalAddress.isPresent())
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ApiResponse("Company address not found !", false));
+        company.setAddress(optionalAddress.get());
         companyRepository.save(company);
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(new ApiResponse("Company successfully edited !", true));
     }
